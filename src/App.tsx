@@ -1,0 +1,121 @@
+import { useState, useCallback, useMemo } from 'react';
+import { IntroSection } from './components/IntroSection';
+import { VideoSection } from './components/VideoSection';
+import { VolumePrompt } from './components/VolumePrompt';
+import { OutroSection } from './components/OutroSection';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { LoadingSpinner } from './components/LoadingSpinner';
+import { InitialLoader } from './components/InitialLoader';
+import { StarfieldBackground } from './components/StarfieldBackground';
+import { AudioControl } from './components/AudioControl';
+import { AnimatedGallery } from './components/AnimatedGallery';
+import { ReelsCarousel } from './components/ReelsCarousel';
+import { MessageSection } from './components/MessageSection';
+import { SmiskiGif } from './components/SmiskiGif';
+import { SwingingLabubu } from './components/SwingingLabubu';
+import CustomCursor from './components/CustomCursor';
+import { useVideoManager } from './hooks/useVideoManager';
+import { showcaseVideos } from './data/videos';
+import { scrollToElement, getNextVideoId } from './utils/navigation';
+import type { AppState } from './types';
+
+const App: React.FC = () => {
+  const { playVideo, pauseActiveVideo, registerVideo, unregisterVideo } = useVideoManager();
+  const [showInitialLoader, setShowInitialLoader] = useState(true);
+  const [appState, setAppState] = useState<AppState>({
+    soundEnabled: null,
+    currentVideoIndex: 0,
+    isLoading: false,
+    error: null,
+  });
+  const [volume, setVolume] = useState(0.7);
+
+  const handleInitialLoaderComplete = useCallback(() => {
+    setShowInitialLoader(false);
+  }, []);
+
+  const handleVolumeConfirm = useCallback((soundEnabled: boolean) => {
+    setAppState(prev => ({ ...prev, soundEnabled }));
+  }, []);
+
+  const toggleSound = useCallback(() => {
+    setAppState(prev => ({ ...prev, soundEnabled: !prev.soundEnabled }));
+  }, []);
+
+  const handleVolumeChange = useCallback((newVolume: number) => {
+    setVolume(newVolume);
+    if (newVolume === 0) {
+      setAppState(prev => ({ ...prev, soundEnabled: false }));
+    } else if (!appState.soundEnabled) {
+      setAppState(prev => ({ ...prev, soundEnabled: true }));
+    }
+  }, [appState.soundEnabled]);
+
+  const handleVideoEnd = useCallback((index: number) => {
+    const nextId = getNextVideoId(index, showcaseVideos.length);
+    scrollToElement(nextId);
+
+    setAppState(prev => ({
+      ...prev,
+      currentVideoIndex: Math.min(index + 1, showcaseVideos.length)
+    }));
+  }, []);
+
+  const videoSections = useMemo(() =>
+    showcaseVideos.map((video, index) => (
+      <VideoSection
+        key={video.id}
+        src={video.url}
+        index={index}
+        onEnded={handleVideoEnd}
+        soundEnabled={appState.soundEnabled}
+      />
+    )), [handleVideoEnd, appState.soundEnabled]
+  );
+
+
+
+  if (showInitialLoader) {
+    return <InitialLoader onComplete={handleInitialLoaderComplete} />;
+  }
+
+  if (appState.soundEnabled === null) {
+    return <VolumePrompt onConfirm={handleVolumeConfirm} />;
+  }
+
+  if (appState.isLoading) {
+    return <LoadingSpinner />;
+  }
+
+  return (
+    <ErrorBoundary>
+      <CustomCursor />
+      <StarfieldBackground />
+      <main
+        className="snap-y snap-mandatory overflow-y-scroll h-screen w-full relative z-10 touch-pan-y overscroll-y-contain"
+        role="main"
+        aria-label="Video showcase application"
+        style={{ WebkitOverflowScrolling: 'touch' }}
+      >
+        {/* Professional Audio Control */}
+        <AudioControl
+          soundEnabled={!!appState.soundEnabled}
+          onToggle={toggleSound}
+          volume={volume}
+          onVolumeChange={handleVolumeChange}
+        />
+        <IntroSection />
+        {/* {videoSections} */}
+        <ReelsCarousel soundEnabled={!!appState.soundEnabled} playVideo={playVideo} registerVideo={registerVideo} unregisterVideo={unregisterVideo} />
+
+        <MessageSection soundEnabled={!!appState.soundEnabled} playVideo={playVideo} registerVideo={registerVideo} unregisterVideo={unregisterVideo} />
+        <SmiskiGif />
+        <SwingingLabubu />
+        <AnimatedGallery />
+        <OutroSection id="outro" />
+      </main>
+    </ErrorBoundary>
+  );
+};
+
+export default App;

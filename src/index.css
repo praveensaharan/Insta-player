@@ -1,0 +1,69 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Device compatibility */
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    touch-action: manipulation;
+  }
+  
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Responsive utilities */
+@layer utilities {
+  .touch-pan-y {
+    touch-action: pan-y;
+  }
+  
+  .overscroll-y-contain {
+    overscroll-behavior-y: contain;
+  }
+  
+  @supports (-webkit-overflow-scrolling: touch) {
+    .webkit-scroll {
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+}
+
+html,
+body {
+  font-family: 'Ubuntu', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  background: #000000;
+  color: #ffffff;
+  cursor: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  cursor: none !important;
+}
+
+.volume-prompt * {
+  cursor: auto !important;
+}
+
+.volume-prompt button {
+  cursor: pointer !important;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+  transition: all 0.3s ease;
+}
