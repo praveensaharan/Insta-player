@@ -57,7 +57,7 @@ export const InitialLoader: React.FC<InitialLoaderProps> = ({ onComplete }) => {
         </motion.div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         .card {
           --bg-color: #000;
           background-color: var(--bg-color);

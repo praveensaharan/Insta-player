@@ -3,7 +3,7 @@ import React from 'react';
 export const StarfieldBackground: React.FC = () => {
   return (
     <div className="starfield">
-      <style jsx>{`
+      <style>{`
         .starfield {
           position: fixed;
           top: 0;

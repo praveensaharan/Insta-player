@@ -9,7 +9,7 @@ interface ReelsCarouselProps {
   unregisterVideo: (video: HTMLVideoElement) => void;
 }
 
-export const ReelsCarousel: React.FC<ReelsCarouselProps> = ({ soundEnabled, playVideo, registerVideo, unregisterVideo }) => {
+export const ReelsCarousel: React.FC<ReelsCarouselProps> = ({ soundEnabled, registerVideo, unregisterVideo }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
@@ -79,7 +79,7 @@ export const ReelsCarousel: React.FC<ReelsCarouselProps> = ({ soundEnabled, play
             >
               <div className="relative bg-gradient-to-br from-white/10 to-white/5 rounded-3xl overflow-hidden shadow-2xl border border-white/20 backdrop-blur-xl">
                 <video
-                  ref={(el) => (videoRefs.current[index] = el)}
+                  ref={(el) => { videoRefs.current[index] = el; }}
                   src={reel.url}
                   className="w-full h-[500px] object-cover"
                   muted={!soundEnabled}

@@ -59,7 +59,7 @@ export const MessageSection: React.FC<MessageSectionProps> = ({ soundEnabled, pl
               <div className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10 shadow-2xl max-w-sm">
                 <div className="w-full h-80 mb-6">
                   <video
-                    ref={(el) => (videoRefs.current[index] = el)}
+                    ref={(el) => { videoRefs.current[index] = el; }}
                     src={video.url}
                     className="w-full h-full object-cover rounded-2xl hover-glow"
                     muted={!soundEnabled}

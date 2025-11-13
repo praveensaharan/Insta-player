@@ -1,6 +1,6 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback } from 'react';
 import { IntroSection } from './components/IntroSection';
-import { VideoSection } from './components/VideoSection';
+
 import { VolumePrompt } from './components/VolumePrompt';
 import { OutroSection } from './components/OutroSection';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -15,12 +15,11 @@ import { SmiskiGif } from './components/SmiskiGif';
 import { SwingingLabubu } from './components/SwingingLabubu';
 import CustomCursor from './components/CustomCursor';
 import { useVideoManager } from './hooks/useVideoManager';
-import { showcaseVideos } from './data/videos';
-import { scrollToElement, getNextVideoId } from './utils/navigation';
+
 import type { AppState } from './types';
 
 const App: React.FC = () => {
-  const { playVideo, pauseActiveVideo, registerVideo, unregisterVideo } = useVideoManager();
+  const { playVideo, registerVideo, unregisterVideo } = useVideoManager();
   const [showInitialLoader, setShowInitialLoader] = useState(true);
   const [appState, setAppState] = useState<AppState>({
     soundEnabled: null,
@@ -51,27 +50,20 @@ const App: React.FC = () => {
     }
   }, [appState.soundEnabled]);
 
-  const handleVideoEnd = useCallback((index: number) => {
-    const nextId = getNextVideoId(index, showcaseVideos.length);
-    scrollToElement(nextId);
 
-    setAppState(prev => ({
-      ...prev,
-      currentVideoIndex: Math.min(index + 1, showcaseVideos.length)
-    }));
-  }, []);
 
-  const videoSections = useMemo(() =>
-    showcaseVideos.map((video, index) => (
-      <VideoSection
-        key={video.id}
-        src={video.url}
-        index={index}
-        onEnded={handleVideoEnd}
-        soundEnabled={appState.soundEnabled}
-      />
-    )), [handleVideoEnd, appState.soundEnabled]
-  );
+  // Commented out unused videoSections
+  // const videoSections = useMemo(() =>
+  //   showcaseVideos.map((video, index) => (
+  //     <VideoSection
+  //       key={video.id}
+  //       src={video.url}
+  //       index={index}
+  //       onEnded={handleVideoEnd}
+  //       soundEnabled={appState.soundEnabled}
+  //     />
+  //   )), [handleVideoEnd, appState.soundEnabled]
+  // );
 
 
 
