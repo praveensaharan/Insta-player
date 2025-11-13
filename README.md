@@ -1,4 +1,4 @@
-# Missing You - Work Bestie Memories
+# Insta-scrolls Memories
 
 <div align="center">
   <img src="public/smiski1.svg" alt="Missing You Logo" width="120" height="120">
@@ -139,13 +139,13 @@ npm run build
 
 The `dist` folder contains the optimized production build.
 
-## 📱 Device Compatibility
+## Device Compatibility
 
 - **Mobile**: iOS Safari 14+, Android Chrome 90+
 - **Tablet**: iPad Safari, Android tablets
 - **Desktop**: Chrome 90+, Firefox 88+, Safari 14+, Edge 90+
 
-## 🎯 Performance Features
+## Performance Features
 
 - **Video Preloading**: Background loading during initial screen
 - **Intersection Observer**: Videos play only when visible
@@ -153,11 +153,11 @@ The `dist` folder contains the optimized production build.
 - **Optimized Assets**: Compressed images and videos
 - **CDN Delivery**: Fast global content delivery
 
-## 💝 The Message
+## The Message
 
 _"Sometimes it's not where you work, it's who you work with that makes a job worth going to everyday. We all have that one friend from your old job/project, that we really wish we still work with..."_
 
-## 📄 License
+## License
 
 This project is a personal tribute and is not intended for commercial use.
 
