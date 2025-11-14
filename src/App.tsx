@@ -13,6 +13,7 @@ import { ReelsCarousel } from './components/ReelsCarousel';
 import { MessageSection } from './components/MessageSection';
 import { SmiskiGif } from './components/SmiskiGif';
 import { SwingingLabubu } from './components/SwingingLabubu';
+import { Footer } from './components/Footer';
 import CustomCursor from './components/CustomCursor';
 import { useVideoManager } from './hooks/useVideoManager';
 
@@ -52,21 +53,6 @@ const App: React.FC = () => {
 
 
 
-  // Commented out unused videoSections
-  // const videoSections = useMemo(() =>
-  //   showcaseVideos.map((video, index) => (
-  //     <VideoSection
-  //       key={video.id}
-  //       src={video.url}
-  //       index={index}
-  //       onEnded={handleVideoEnd}
-  //       soundEnabled={appState.soundEnabled}
-  //     />
-  //   )), [handleVideoEnd, appState.soundEnabled]
-  // );
-
-
-
   if (showInitialLoader) {
     return <InitialLoader onComplete={handleInitialLoaderComplete} />;
   }
@@ -101,10 +87,12 @@ const App: React.FC = () => {
         <ReelsCarousel soundEnabled={!!appState.soundEnabled} playVideo={playVideo} registerVideo={registerVideo} unregisterVideo={unregisterVideo} />
 
         <MessageSection soundEnabled={!!appState.soundEnabled} playVideo={playVideo} registerVideo={registerVideo} unregisterVideo={unregisterVideo} />
-        <SmiskiGif />
+
         <SwingingLabubu />
+        <SmiskiGif />
         <AnimatedGallery />
         <OutroSection id="outro" />
+        <Footer />
       </main>
     </ErrorBoundary>
   );

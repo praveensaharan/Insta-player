@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { motion, type PanInfo } from 'framer-motion';
 import { reelsVideos } from '../data/videos';
 
 interface ReelsCarouselProps {
@@ -11,10 +11,41 @@ interface ReelsCarouselProps {
 
 export const ReelsCarousel: React.FC<ReelsCarouselProps> = ({ soundEnabled, registerVideo, unregisterVideo }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const lastInteraction = useRef(0);
+  const scrollTimeout = useRef<number | null>(null);
 
   const nextReel = () => {
     setCurrentIndex((prev) => (prev + 1) % reelsVideos.length);
+  };
+
+  const navigate = useCallback((direction: 'prev' | 'next') => {
+    const now = Date.now();
+    if (now - lastInteraction.current < 300) return;
+    lastInteraction.current = now;
+    
+    if (direction === 'prev' && currentIndex > 0) {
+      setCurrentIndex(prev => prev - 1);
+    } else if (direction === 'next' && currentIndex < reelsVideos.length - 1) {
+      setCurrentIndex(prev => prev + 1);
+    }
+  }, [currentIndex]);
+
+  const handleDragStart = () => setIsDragging(true);
+  
+  const handleDragEnd = (_: any, info: PanInfo) => {
+    setIsDragging(false);
+    const threshold = 80;
+    const velocity = Math.abs(info.velocity.x);
+    
+    if (velocity > 500 || Math.abs(info.offset.x) > threshold) {
+      if (info.offset.x > 0) {
+        navigate('prev');
+      } else {
+        navigate('next');
+      }
+    }
   };
 
   useEffect(() => {
@@ -30,12 +61,46 @@ export const ReelsCarousel: React.FC<ReelsCarouselProps> = ({ soundEnabled, regi
   }, [currentIndex, registerVideo, unregisterVideo]);
 
   useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') {
+        navigate('prev');
+      } else if (e.key === 'ArrowRight') {
+        navigate('next');
+      }
+    };
+
+    const handleWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+        e.preventDefault();
+        
+        if (scrollTimeout.current) {
+          clearTimeout(scrollTimeout.current);
+        }
+        
+        scrollTimeout.current = setTimeout(() => {
+          if (e.deltaX > 0) {
+            navigate('next');
+          } else {
+            navigate('prev');
+          }
+        }, 150);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('wheel', handleWheel, { passive: false });
+    
     return () => {
       videoRefs.current.forEach(video => {
         if (video) unregisterVideo(video);
       });
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('wheel', handleWheel);
+      if (scrollTimeout.current) {
+        clearTimeout(scrollTimeout.current);
+      }
     };
-  }, [unregisterVideo]);
+  }, [currentIndex, unregisterVideo, navigate]);
 
   return (
     <section className="h-screen flex flex-col items-center justify-center snap-start px-6 relative overflow-hidden">
@@ -65,9 +130,19 @@ export const ReelsCarousel: React.FC<ReelsCarouselProps> = ({ soundEnabled, regi
 
       <div className="relative w-80 h-[500px] mx-auto z-10">
         <motion.div
-          className="flex"
+          className={`flex select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
           animate={{ x: -currentIndex * 320 }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          drag="x"
+          dragConstraints={{ left: -120, right: 120 }}
+          dragElastic={0.1}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+          transition={{ 
+            type: "spring", 
+            stiffness: 300, 
+            damping: 30,
+            mass: 0.8
+          }}
         >
           {reelsVideos.map((reel, index) => (
             <motion.div

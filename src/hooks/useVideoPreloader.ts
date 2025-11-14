@@ -5,6 +5,8 @@ export const useVideoPreloader = () => {
   const [loadedCount, setLoadedCount] = useState(0);
   const [totalVideos] = useState(reelsVideos.length + memoryVideos.length);
   const [isComplete, setIsComplete] = useState(false);
+  const [videosLoaded, setVideosLoaded] = useState(false);
+  const [minTimeElapsed, setMinTimeElapsed] = useState(false);
 
   useEffect(() => {
     const allVideos = [...reelsVideos, ...memoryVideos];
@@ -30,13 +32,27 @@ export const useVideoPreloader = () => {
 
     const preloadAll = async () => {
       await Promise.all(allVideos.map(video => preloadVideo(video.url)));
-      setIsComplete(true);
+      setVideosLoaded(true);
     };
 
+    // Minimum 3-second timer
+    const timer = setTimeout(() => {
+      setMinTimeElapsed(true);
+    }, 3000);
+
     preloadAll();
+
+    return () => clearTimeout(timer);
   }, [totalVideos]);
+
+  // Complete only when both videos are loaded AND minimum time has elapsed
+  useEffect(() => {
+    if (videosLoaded && minTimeElapsed) {
+      setIsComplete(true);
+    }
+  }, [videosLoaded, minTimeElapsed]);
 
   const progress = Math.round((loadedCount / totalVideos) * 100);
 
-  return { progress, isComplete, loadedCount, totalVideos };
+  return { progress, isComplete, loadedCount, totalVideos, videosLoaded, minTimeElapsed };
 };
