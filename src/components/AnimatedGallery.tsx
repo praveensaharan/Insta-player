@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { useState } from 'react';
 
 export const AnimatedGallery: React.FC = () => {
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   const images = [
     { src: '/shakashaka.jpg', title: 'Shakashaka' },
@@ -36,12 +36,20 @@ export const AnimatedGallery: React.FC = () => {
             whileHover={{
               rotate: 0,
               y: -80,
-              scale: hoveredIndex === index ? 1.4 : 1.1,
+              scale: activeIndex === index ? 1.4 : 1.1,
               zIndex: 50,
               filter: 'brightness(1.1) saturate(1.2)'
             }}
-            onHoverStart={() => setHoveredIndex(index)}
-            onHoverEnd={() => setHoveredIndex(null)}
+            whileTap={{
+              rotate: 0,
+              y: -80,
+              scale: 1.4,
+              zIndex: 50,
+              filter: 'brightness(1.1) saturate(1.2)'
+            }}
+            onHoverStart={() => setActiveIndex(index)}
+            onHoverEnd={() => setActiveIndex(null)}
+            onTap={() => setActiveIndex(activeIndex === index ? null : index)}
             transition={{
               duration: 0.6,
               ease: [0.25, 0.46, 0.45, 0.94],
@@ -53,8 +61,8 @@ export const AnimatedGallery: React.FC = () => {
             <motion.div
               className="absolute -inset-2 bg-gradient-to-r from-purple-500/20 via-blue-500/20 to-cyan-500/20 rounded-2xl blur-xl"
               animate={{
-                opacity: hoveredIndex === index ? 0.8 : 0,
-                scale: hoveredIndex === index ? 1.2 : 1
+                opacity: activeIndex === index ? 0.8 : 0,
+                scale: activeIndex === index ? 1.2 : 1
               }}
               transition={{ duration: 0.3 }}
             />
@@ -68,8 +76,7 @@ export const AnimatedGallery: React.FC = () => {
             {/* Overlay with title */}
             <motion.div
               className="absolute inset-0 bg-black/40 rounded-2xl flex items-end p-4"
-              initial={{ opacity: 0 }}
-              whileHover={{ opacity: 1 }}
+              animate={{ opacity: activeIndex === index ? 1 : 0 }}
               transition={{ duration: 0.3 }}
             >
               <span className="text-white font-semibold text-sm sm:text-base md:text-lg tracking-wide">
@@ -78,7 +85,7 @@ export const AnimatedGallery: React.FC = () => {
             </motion.div>
 
             {/* Floating particles */}
-            {hoveredIndex === index && (
+            {activeIndex === index && (
               <motion.div
                 className="absolute -top-4 -right-4 w-2 h-2 bg-white rounded-full"
                 animate={{
@@ -106,6 +113,9 @@ export const AnimatedGallery: React.FC = () => {
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-purple-200 to-cyan-200 mb-4">
           What's Meant For You
         </h1>
+        <p className="text-white/70 max-w-2xl mx-auto text-sm sm:text-base md:text-lg">
+          Some people don't offer advise they offer presence and somehow that heals more.
+        </p>
 
       </motion.div>
 

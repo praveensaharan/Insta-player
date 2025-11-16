@@ -9,16 +9,25 @@ interface ReelsCarouselProps {
   unregisterVideo: (video: HTMLVideoElement) => void;
 }
 
-export const ReelsCarousel: React.FC<ReelsCarouselProps> = ({ soundEnabled, registerVideo, unregisterVideo }) => {
+export const ReelsCarousel: React.FC<ReelsCarouselProps> = ({ soundEnabled, playVideo, registerVideo, unregisterVideo }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const lastInteraction = useRef(0);
   const scrollTimeout = useRef<number | null>(null);
 
-  const nextReel = () => {
-    setCurrentIndex((prev) => (prev + 1) % reelsVideos.length);
-  };
+  const nextReel = useCallback(() => {
+    const nextIndex = (currentIndex + 1) % reelsVideos.length;
+    setCurrentIndex(nextIndex);
+    
+    // Play the next video after state update
+    setTimeout(() => {
+      const nextVideo = videoRefs.current[nextIndex];
+      if (nextVideo) {
+        playVideo(nextVideo);
+      }
+    }, 100);
+  }, [currentIndex, playVideo]);
 
   const navigate = useCallback((direction: 'prev' | 'next') => {
     const now = Date.now();
@@ -160,6 +169,12 @@ export const ReelsCarousel: React.FC<ReelsCarouselProps> = ({ soundEnabled, regi
                   muted={!soundEnabled}
                   playsInline
                   onEnded={nextReel}
+                  onLoadedData={() => {
+                    if (index === currentIndex) {
+                      const video = videoRefs.current[index];
+                      if (video) playVideo(video);
+                    }
+                  }}
                   loop={false}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
